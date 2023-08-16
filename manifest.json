@@ -1,0 +1,7 @@
+{
+  "name": "create-nx-workspace",
+  "id": "1273614250700669298",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "editorType": ["figjam", "figma"]
+}

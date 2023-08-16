@@ -1,0 +1,23 @@
+{
+  "name": "create-nx-workspace",
+  "version": "1.0.0",
+  "description": "Create Nx Workspace with Figma Components",
+  "scripts": {
+    "check": "for i in */tsconfig.json; do echo $i; (cd $(dirname $i) && tsc); done",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/guiseek/create-nx-workspace.git"
+  },
+  "author": "Figma",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/guiseek/create-nx-workspace/issues"
+  },
+  "homepage": "https://github.com/guiseek/create-nx-workspace#readme",
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.34.1"
+  }
+}
