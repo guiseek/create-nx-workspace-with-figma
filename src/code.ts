@@ -40,8 +40,8 @@ function findLibsOnScope(scope: SectionNode) {
 }
 
 const plugins = {
-  server: ['@nx/nest', '@nx/express'],
-  client: ['@nx/angular', '@nx/react', '@nx/webb', '@nx/vite'],
+  server: ['@nx/nest', '@nx/express', '@nx/node'],
+  client: ['@nx/angular', '@nx/react', '@nx/web', '@nx/vite'],
 }
 
 function createApps() {
@@ -84,7 +84,7 @@ function createLibs(scope: SectionNode) {
 
   findLibsOnScope(scope).map((lib) => {
     const {name, plugin, libraryType, collection} = getMetadata(
-      findLibTextNodes(lib)
+      findLibTextNodes(lib),
     )
 
     let cmd = `npx nx generate ${plugin}:${collection} ${libraryType}-${name}`
@@ -122,7 +122,7 @@ function createLibs(scope: SectionNode) {
   return {commands, install}
 }
 
-figma.on('run', async () => {
+figma.on('run', () => {
   const projects = createApps()
 
   findScopesOnPage(figma.currentPage)
@@ -134,8 +134,21 @@ figma.on('run', async () => {
 
   const plugins = [...new Set(projects.install)]
 
-  console.log(`npm i -D ` + plugins.join(' '))
-  console.log(projects.commands.join('\n'))
+  const stylesheet = `
+  <style>
+  pre {
+    color: #111;
+    padding: 8px;
+    display: block;
+    font-size: 13px;
+    border-radius: 8px;
+    background: #f1f1f1;
+    white-space: pre-line;
+  }
+  </style>`
+  const npmInstall = `<pre>${`npm i -D ` + plugins.join(' ')}</pre>`
+  const nxCommands = projects.commands.map((cmd) => `<pre>${cmd}</pre>`).join('')
+  const template = stylesheet + npmInstall + nxCommands
 
-  figma.closePlugin('Closed')
+  figma.showUI(template, {visible: true, width: 1260, height: 620})
 })

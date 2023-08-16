@@ -5,8 +5,7 @@
     "outDir": "dist",
     "typeRoots": [
       "./node_modules/@types",
-      "./node_modules/@figma",
-      "./src/code.d"
+      "./node_modules/@figma"
     ]
   }
 }

@@ -2,6 +2,7 @@
   "name": "create-nx-workspace",
   "version": "1.0.0",
   "description": "Create Nx Workspace with Figma Components",
+  "type": "module",
   "scripts": {
     "check": "for i in */tsconfig.json; do echo $i; (cd $(dirname $i) && tsc); done",
     "test": "echo \"Error: no test specified\" && exit 1",
