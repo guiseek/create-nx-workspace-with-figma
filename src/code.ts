@@ -113,6 +113,17 @@ function createLibs(scope: SectionNode) {
       }
     }
 
+    if (plugin === '@nx/nest') {
+      cmd += `\n`
+      if (libraryType === 'resource') {
+        cmd += `npm i @nestjs/mapped-types \n`
+        cmd += `rm libs/${scope.name}/${libraryType}-${name}/src/lib/${scope.name}-${libraryType}-${name}.module.ts \n`
+        cmd += `npx nx generate @nx/nest:resource --name=${scope.name}-${libraryType}-${name} --type=rest --crud`
+        cmd += ` --project=${scope.name}-${libraryType}-${name}`
+        cmd += ` --path=lib --flat`
+      }
+    }
+
     cmd += ` --no-interactive`
 
     install.push(plugin)
@@ -122,7 +133,7 @@ function createLibs(scope: SectionNode) {
   return {commands, install}
 }
 
-figma.on('run', () => {
+figma.on('run', async () => {
   const projects = createApps()
 
   findScopesOnPage(figma.currentPage)
@@ -149,6 +160,11 @@ figma.on('run', () => {
   const npmInstall = `<pre>${`npm i -D ` + plugins.join(' ')}</pre>`
   const nxCommands = projects.commands.map((cmd) => `<pre>${cmd}</pre>`).join('')
   const template = stylesheet + npmInstall + nxCommands
-
   figma.showUI(template, {visible: true, width: 1260, height: 620})
 })
+
+
+figma.ui.onmessage = (message, props) => {
+  console.log(props.origin)
+  console.log(message)
+}
