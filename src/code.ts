@@ -87,7 +87,13 @@ function createLibs(scope: SectionNode) {
       findLibTextNodes(lib),
     )
 
-    let cmd = `npx nx generate ${plugin}:${collection} ${libraryType}-${name}`
+    let cmd
+
+    if (name.length) {
+      cmd = `npx nx generate ${plugin}:${collection} ${libraryType}-${name}`
+    } else {
+      cmd = `npx nx generate ${plugin}:${collection} ${libraryType}`
+    }
 
     if (plugin === '@nx/js') {
       cmd += ` --bundler=tsc`
