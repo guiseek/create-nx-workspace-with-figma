@@ -6,6 +6,16 @@ function isRepoScope<T extends SceneNode>(node: T) {
   return node.type === 'SECTION'
 }
 
+function formatString(text: string): string {
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/([^\w]+|\s+)/g, '-')
+    .replace(/(^-+|-+$)/, '')
+    .replace(/\-\-+/g, '-')
+    .toLowerCase()
+}
+
 function isTextNode<T extends SceneNode>(node: T) {
   return node.type === 'TEXT'
 }
@@ -84,16 +94,19 @@ function createLibs(scope: SectionNode) {
 
   findLibsOnScope(scope).map((lib) => {
     const {name, plugin, libraryType, collection} = getMetadata(
-      findLibTextNodes(lib),
+      findLibTextNodes(lib)
     )
 
-    let cmd
+    let cmd = `npx nx generate ${plugin}:${collection}`
+    let libraryName = ``
 
-    if (name.length) {
-      cmd = `npx nx generate ${plugin}:${collection} ${libraryType}-${name}`
+    if (name.trim().length) {
+      libraryName = `${libraryType}-${formatString(name)}`
     } else {
-      cmd = `npx nx generate ${plugin}:${collection} ${libraryType}`
+      libraryName = `${libraryType}`
     }
+
+    cmd += ` ${libraryName}`
 
     if (plugin === '@nx/js') {
       cmd += ` --bundler=tsc`
@@ -114,18 +127,18 @@ function createLibs(scope: SectionNode) {
       if (libraryType === 'feature') {
         cmd += ` --routing \n`
 
-        cmd += `npx nx generate @nx/angular:component ${scope.name}-${libraryType}-${name}`
-        cmd += ` --flat --project=${scope.name}-${libraryType}-${name}`
+        cmd += `npx nx generate @nx/angular:component ${scope.name}-${libraryName}`
+        cmd += ` --flat --project=${scope.name}-${libraryName}`
       }
     }
 
     if (plugin === '@nx/nest') {
-      cmd += `\n`
       if (libraryType === 'resource') {
+        cmd += `\n`
         cmd += `npm i @nestjs/mapped-types \n`
-        cmd += `rm libs/${scope.name}/${libraryType}-${name}/src/lib/${scope.name}-${libraryType}-${name}.module.ts \n`
-        cmd += `npx nx generate @nx/nest:resource --name=${scope.name}-${libraryType}-${name} --type=rest --crud`
-        cmd += ` --project=${scope.name}-${libraryType}-${name}`
+        cmd += `rm libs/${scope.name}/${libraryName}/src/lib/${scope.name}-${libraryName}.module.ts \n`
+        cmd += `npx nx generate @nx/nest:resource --name=${scope.name}-${libraryName} --type=rest --crud`
+        cmd += ` --project=${scope.name}-${libraryName}`
         cmd += ` --path=lib --flat`
       }
     }
@@ -164,11 +177,12 @@ figma.on('run', async () => {
   }
   </style>`
   const npmInstall = `<pre>${`npm i -D ` + plugins.join(' ')}</pre>`
-  const nxCommands = projects.commands.map((cmd) => `<pre>${cmd}</pre>`).join('')
+  const nxCommands = projects.commands
+    .map((cmd) => `<pre>${cmd}</pre>`)
+    .join('')
   const template = stylesheet + npmInstall + nxCommands
   figma.showUI(template, {visible: true, width: 1260, height: 620})
 })
-
 
 figma.ui.onmessage = (message, props) => {
   console.log(props.origin)
